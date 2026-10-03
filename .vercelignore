@@ -1,0 +1,7 @@
+.git/
+qa/
+AGENTS.md
+README.md
+check.mjs
+serve.mjs
+*.log
