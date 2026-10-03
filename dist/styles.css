@@ -24,3 +24,4 @@ footer{padding:42px var(--gutter) 28px;overflow:hidden}.footer-top{display:flex;
 @media(max-width:650px){.map-points{display:none}}
 @media(max-width:650px){.place-card-copy>p:last-of-type{font-size:12px;line-height:1.65}.place-switches button,.place-next{font-size:11px}.place-card-copy .label,.map-heading .label{font-size:8px}.place-card-image span{font-size:8px}.hero-heading .label,.hero-bottom{font-size:8px}.journey-bottom{font-size:8px}}
 @media(max-width:650px) and (max-height:720px){.place-card-copy>p:last-of-type{font-size:11px}.place-card-copy{padding:12px 14px}.place-switches{padding:9px 14px}}
+.kindness-picture>img{height:auto}
