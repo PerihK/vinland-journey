@@ -48,3 +48,6 @@
 @media(max-width:650px) and (max-height:720px){.place-card{bottom:60px;padding:12px;column-gap:13px}.place-card-heading h3{font-size:34px}.place-card-copy>p:last-of-type{font-size:16px}.flag-label{padding:8px 10px;min-width:78px}.flag-pole{height:25px}.journey-bottom{bottom:15px}}
 @media(prefers-reduced-motion:reduce){.journey{height:115svh}.clouds{display:none!important}.map-world{transform:none!important}.map-point{opacity:1;transform:translate(-7px,-100%)}.place-card{opacity:1;transform:none!important}.journey-chapter{opacity:1}.skip-flight{display:flex!important}}
 .map-point.flipped .flag-label{transform:translateX(calc(-100% + 12px))}
+.hero-image{object-position:50% 50%}
+.hero-shade{background:linear-gradient(0deg,rgba(17,31,31,.42),rgba(17,31,31,.08) 60%,rgba(17,31,31,.18))}
+@media(max-width:650px){.hero-image{object-position:63% 50%}}

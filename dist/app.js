@@ -21,9 +21,9 @@
   const points=$$('.map-point');
   const card=$('#place-card'), pointGroup=$('.map-points');
   const places={
-    shore:{title:'Берег',image:'shore',kicker:'У воды',description:'Только вода, ветер и время. Здесь можно никуда не спешить.',alt:'Естественный галечный берег северной реки',x:.18,y:.36,mx:.22,my:.35},
-    fields:{title:'Поля',image:'fields',kicker:'На земле',description:'Земля, которой хватает. Вырастить урожай и разделить его с теми, кто рядом.',alt:'Небольшие поля в северной долине',x:.43,y:.66,mx:.51,my:.46},
-    home:{title:'Дом',image:'home',kicker:'Рядом с другими',description:'Дверь открыта. За общим столом есть место для каждого.',alt:'Небольшой деревянный дом под травяной крышей',x:.35,y:.51,mx:.76,my:.58}
+    shore:{title:'Берег',image:'shore',kicker:'У воды',description:'Только вода, ветер и время. Здесь можно никуда не спешить.',alt:'Северный морской берег и водопад',x:.4,y:.65,mx:.35,my:.65},
+    fields:{title:'Поля',image:'fields-card',kicker:'На земле',description:'Земля, которой хватает. Вырастить урожай и разделить его с теми, кто рядом.',alt:'Зелёное поле под туманной горой',x:.26,y:.3,mx:.22,my:.3},
+    home:{title:'Дом',image:'home-card',kicker:'Рядом с другими',description:'Дверь открыта. За общим столом есть место для каждого.',alt:'Старинные дома с травяными крышами в Саксуне',x:.68,y:.5,mx:.78,my:.48}
   };
   const keys=Object.keys(places);
   const mapImage=$('.map-photo');
@@ -107,7 +107,7 @@
     const image=$('#place-image');image.style.opacity='0';
     await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:160));
     if(token!==pictureToken)return;
-    image.src='/assets/'+data.image+'.webp?v=20261003';image.alt=data.alt;
+    image.src='/assets/'+data.image+'.webp?v=photo20261003';image.alt=data.alt;
     $('#place-title').textContent=data.title;$('#place-kicker').textContent=data.kicker;$('#place-description').textContent=data.description;
     try{await image.decode();}catch{}
     if(token===pictureToken)image.style.opacity='1';
