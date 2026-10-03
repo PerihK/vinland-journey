@@ -10,7 +10,7 @@ No dependencies or build step. Run `npm start` and open http://127.0.0.1:4192. R
 
 ## Motion
 
-Native scrolling drives a sticky aerial scene. Separate transparent cloud layers move at different speeds; bounded camera movement follows the selected place. Motion respects `prefers-reduced-motion`; navigation and all place selectors work with a keyboard. All arrows are SVG.
+Native scrolling drives a sticky aerial scene. Separate transparent cloud layers clear the terrain; three flags rise on the landscape. Shore, fields and home unfold automatically during scrolling, with optional flag shortcuts. Bounded camera movement stays gentle. A separate portrait landscape preserves the composition on phones. Motion respects `prefers-reduced-motion`; navigation and all place selectors work with a keyboard. All arrows are SVG.
 
 ## Deployment
 

@@ -1,4 +1,64 @@
-# Original imagery
+# Current imagery — October 3, 2026
+
+Original generated assets for fictional Vinland Journey. No reference-site photography was copied. Horizon and alpha clouds remain unchanged. The user-supplied Primland screenshot guided aerial composition and scale only; the geography is original. Clouds are separate for animation.
+
+Desktop terrain is 1774 × 887; mobile terrain is 1024 × 1536. WebP encoding does not upscale or invent detail. Source PNGs remain in `C:/Users/perik/.codex/generated_images/01a0f236-aea4-7f02-beba-74946edd60b6/`. Production copies are in this repository.
+
+## Aerial forest
+
+Output: `dist/assets/valley.webp`
+
+Source: `exec-f7a00e9c-9c66-4a75-aaff-dafa90870377.png`
+
+Exact prompt:
+
+Use case: photorealistic-natural. Asset type: large aerial terrain photograph for immersive Vinland web journey. Input image is a COMPOSITION AND SCALE REFERENCE only. Create an original very wide landscape 2:1 image at highest available resolution, target 3840x1920. Camera almost vertically downward from a kilometre or more above a huge real northern coastal valley. Match the reference's far aerial scale: hundreds of tiny individually detailed trees, rolling hills fully covered in natural birch and pine woodland, a slender deep dark blue-green river making many graceful irregular meanders across the upper half and left side. Soft mossy green forest canopy with varied species, natural uneven muted greens, pale rocky patches, narrow grassy clearings. In lower central half, a few small clearings cultivated as early medieval fields, three very tiny scattered wooden turf-roof dwellings joined by narrow dirt footpaths. No modern resort, golf course, modern architecture, asphalt roads or vehicles. The river and landscape dominate; buildings only almost invisible anchors for later labels. Soft diffuse northern summer sunlight, subtle real relief and shadows. Realistic photogrammetric aerial photography, organic individually resolved canopy, terrain scale like the reference, polished documentary image, not painterly illustration, not anime, not toy diorama, not oversaturated videogame map. No horizon or sky, NO CLOUDS at all, no fog baked in, no labels, no text, no pins, no buttons, no UI. Keep all of the upper left river bank, middle cultivated clearing and lower right tiny turf house clearly distinguishable as three future places. The reference is not an edit target; invent a new geography with comparable composition and resolution.
+
+## Mobile forest
+
+Output: `dist/assets/valley-mobile.webp`
+
+Source: `exec-db3404fa-cef9-4570-b78b-7317b0abb276.png`
+
+Exact prompt:
+
+Create a vertical 2:3 adaptation of the supplied aerial forest landscape for the mobile version of the same Vinland website. Preserve the photorealistic woodland terrain, muted natural northern summer greens, tiny individual pine and birch trees, winding dark blue-green river and small early medieval clearings. Camera almost straight down from very far above, no sky, no clouds. Recompose the geography vertically rather than cropping: narrow meandering river running from upper left through upper middle to left-middle and lower left; small cultivated clearing around x0.54 y0.48; one tiny turf-roof wooden dwelling around x0.73 y0.60. Keep all three places discernible, landscape overwhelmingly dominates. Natural aerial photographic texture and terrain relief, no cartoon, no illustration, no saturated game rendering. No modern roads, vehicles or buildings. Absolutely no labels, text, UI, pins or symbols. High resolution 1024x1536 or greater.
+
+## Shore
+
+Output: `dist/assets/shore.webp`
+
+Source: `exec-d1a1218f-4fdb-498a-b11e-8e86048981ce.png`
+
+Exact prompt:
+
+Use case: photorealistic-natural. NEW landscape 16:9 documentary photograph taken standing on the pebbly bank of the river in reference valley. Reference only establishes the place and neutral realistic colour. Water reflecting overcast blue-grey sky, small uneven pale stones at lower edge, unmanicured meadow grass along the shore, low green hills and sparse dark birch patches receding in the distance. No spectacular mountains, no house, no people, no warm golden filter, no illustration, no render. Realistic unretouched outdoor photography, understated calm, credible natural textures and photographic lens detail. No text or logo.
+
+## Fields
+
+Output: `dist/assets/fields.webp`
+
+Source: `exec-4603d646-26bb-448a-88e8-fb79d3c51143.png`
+
+Exact prompt:
+
+Use case: photorealistic-natural. NEW realistic 16:9 landscape photograph of small ancient cultivated fields in the northern Atlantic valley shown in reference. Real camera shot from a grassy slope, uneven green and pale barley patches separated by a narrow dirt path, birch grove farther behind, little grey-blue river and rounded low hills in distance. Gentle northern summer, overcast soft daylight with slight sun breaking through cloud, restrained neutral greens, natural messy grass textures. No people, no machinery, no modern houses, no saturated golden glow, no dramatic fantasy scenery, no computer render, no illustration, no diorama, no text. Real-world editorial documentary landscape.
+
+## Home
+
+Output: `dist/assets/home.webp`
+
+Source: `exec-448b47b5-b815-4016-9853-fca3be1beeff.png`
+
+Exact prompt:
+
+Use case: photorealistic-natural. NEW documentary photographic image wide 16:9 of a modest timber and turf house in the northern Atlantic valley from reference. View slightly downhill from 30 metres away: one small early medieval wooden house with a low grass roof, weathered grey timber, a small vegetable patch, a bench and simple low fence, birch grove, quiet river valley receding behind. House at center-right, appropriately humble, real believable construction. Gentle overcast northern summer light, neutral understated green and grey palette, real individual grass and rough timber textures, imperfect and lived in, no people. Not tourism stock, not luxury cottage, not glowing fantasy hut. Absolutely no 3D render, no painting, no anime, no saturated golden lighting. No text, logo, weapons or characters.
+
+---
+
+# First-version imagery (historical prompts)
+
+The following prompts document the first release. Horizon and clouds are still current; aerial, shore, fields and home were replaced by the assets above.
 
 All six images were generated specifically for this fictional journey with OpenAI ImageGen. No reference-site photography was copied. Original PNGs remain in Codex's generated_images folder; production copies are compressed WebP in dist/assets. The generated horizon was supplied as a place/palette reference for the five companion images.
 

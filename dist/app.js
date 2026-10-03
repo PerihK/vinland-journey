@@ -21,59 +21,70 @@
   const points=$$('.map-point');
   const card=$('#place-card'), pointGroup=$('.map-points');
   const places={
-    shore:{title:'Берег',image:'shore',kicker:'У воды',caption:'Слышать тишину',description:'Здесь не нужно никуда спешить. Можно просто смотреть на воду — и дать мыслям успокоиться.',alt:'Тихий берег северной реки с травой и маленькими цветами',x:.28,y:.75,panY:-.10},
-    fields:{title:'Поля',image:'fields',kicker:'На земле',caption:'Вырастить что-то живое',description:'Сажать, а не отнимать. Делить урожай, а не границы. Простая работа, в которой появляется смысл.',alt:'Зелёно-золотые поля и тропинка к морю',x:.83,y:.35,panY:-.08},
-    home:{title:'Дом',image:'home',kicker:'Рядом с другими',caption:'Быть нужным',description:'Место у общего стола. Тёплый хлеб. Люди, перед которыми не нужно быть сильнее. Достаточно быть собой.',alt:'Простой деревянный дом с зелёной крышей и садом в северной долине',x:.90,y:.28,panY:0}
+    shore:{title:'Берег',image:'shore',kicker:'У воды',description:'Только вода, ветер и время. Здесь можно никуда не спешить.',alt:'Естественный галечный берег северной реки',x:.18,y:.36,mx:.22,my:.35},
+    fields:{title:'Поля',image:'fields',kicker:'На земле',description:'Земля, которой хватает. Вырастить урожай и разделить его с теми, кто рядом.',alt:'Небольшие поля в северной долине',x:.43,y:.66,mx:.51,my:.46},
+    home:{title:'Дом',image:'home',kicker:'Рядом с другими',description:'Дверь открыта. За общим столом есть место для каждого.',alt:'Небольшой деревянный дом под травяной крышей',x:.35,y:.51,mx:.76,my:.58}
   };
   const keys=Object.keys(places);
-  let selected='shore', pictureToken=0;
-  let frame=0, lastTime=0, progress=0, cameraX=0, cameraY=0;
+  const mapImage=$('.map-photo');
+  let selected='shore', pictureToken=0, scrollChapter=0, manualChoice=null;
+  let frame=0,lastTime=0,progress=0,cameraX=0,cameraY=0;
   let arrived=false;
   const set=(el,name,value)=>el.style.setProperty(name,value);
-
+  const smooth=t=>{const v=clamp(t);return v*v*(3-2*v);};
   function setArrival(enabled){
-    if(arrived===enabled)return;
     arrived=enabled;journey.classList.toggle('arrived',enabled);
-    card.inert=!enabled;pointGroup.inert=!enabled;$('.skip-flight').inert=enabled;$('.journey-continue').tabIndex=enabled?0:-1;
+    card.inert=!enabled;pointGroup.inert=!enabled;$('.journey-continue').tabIndex=enabled?0:-1;
   }
-  card.inert=true;pointGroup.inert=true;$('.journey-continue').tabIndex=-1;
+  setArrival(false);
+  mapImage.addEventListener('load',requestRender);
   function render(time){
     frame=0;
-    const vh=innerHeight,w=journey.clientWidth;
+    const vh=journey.querySelector('.journey-sticky').clientHeight,w=journey.clientWidth;
     const step=lastTime?clamp((time-lastTime)/16.67,.3,3):1;lastTime=time;
     const j=journey.getBoundingClientRect();
-    const visible=j.top<vh&&j.bottom>0;
+    const visible=j.top<innerHeight&&j.bottom>0;
     const target=reduced.matches?1:clamp(-j.top/Math.max(1,j.height-vh));
-    const smoothing=reduced.matches?1:1-Math.pow(.88,step);
+    const smoothing=reduced.matches?1:1-Math.pow(.91,step);
     progress=mix(progress,target,smoothing);
     if(Math.abs(progress-target)<.0003)progress=target;
     if(visible){
-      const p=progress, explore=reduced.matches?1:clamp((p-.54)/.21);
-      const baseScale=1.04+.38*clamp(p/.75);
-      const scale=reduced.matches?1:baseScale+explore*.08;
-      const data=places[selected];
-      // Clamp the camera to the photograph bounds so no blank edges can enter view.
-      const photoRatio=1672/941;
-      const worldW=w*1.04,worldH=vh*1.04;
-      const photoW=Math.max(worldW,worldH*photoRatio);
-      const desiredX=mobile.matches?(0.5-data.x)*photoW*.30:(0.44*w-(w*.5+(data.x-.5)*photoW*scale));
-      const maxX=(worldW*scale-w)/2;
-      const maxY=(worldH*scale-vh)/2;
+      const p=progress,explore=reduced.matches?1:smooth((p-.28)/.12);
+      // Each place unfolds through scrolling. Clicking a flag is an optional shortcut.
+      const chapter=reduced.matches?0:(p<.53?0:p<.76?1:2);
+      if(chapter!==scrollChapter){scrollChapter=chapter;manualChoice=null;}
+      const active=manualChoice||keys[chapter];
+      if(active!==selected)selectPlace(active);
+      const scale=reduced.matches?1:1.01+.14*smooth(p/.88);
+      const data=places[selected],isMobile=mobile.matches;
+      const photoRatio=mapImage.naturalWidth&&mapImage.naturalHeight?mapImage.naturalWidth/mapImage.naturalHeight:(isMobile?2/3:2);
+      const worldW=w*1.02,worldH=vh*1.02;
+      const photoW=Math.max(worldW,worldH*photoRatio),photoH=Math.max(worldH,worldW/photoRatio);
+      const landX=isMobile?data.mx:data.x,landY=isMobile?data.my:data.y;
+      const desiredX=(isMobile?.48:.44)*w-(w*.5+(landX-.5)*photoW*scale);
+      const desiredY=(isMobile?.43:.52)*vh-(vh*.5+(landY-.5)*photoH*scale);
+      const maxX=(worldW*scale-w)/2,maxY=(worldH*scale-vh)/2;
       const targetX=reduced.matches?0:clamp(desiredX,-maxX,maxX)*explore;
-      const targetY=reduced.matches?0:clamp(data.panY*vh,-maxY,maxY)*explore;
-      cameraX=mix(cameraX,targetX,smoothing);cameraY=mix(cameraY,targetY,smoothing);
-      set(journey,'--camera-scale',scale);set(journey,'--camera-x',`${cameraX}px`);set(journey,'--camera-y',`${cameraY}px`);
-      set(journey,'--cloud-x',`${-w*p*.45}px`);set(journey,'--cloud-y',`${-vh*p*.55}px`);set(journey,'--cloud-scale',1.15+p*.55);
-      set(journey,'--cloud-opacity',1-clamp((p-.13)/.50));set(journey,'--far-opacity',.65*(1-clamp((p-.20)/.56)));
-      set(journey,'--far-x',`${w*p*.26}px`);set(journey,'--far-y',`${vh*p*.32}px`);
-      set(journey,'--flight-opacity',1-clamp((p-.12)/.24));set(journey,'--flight-rise',`${p*60}px`);
-      set(journey,'--explore-opacity',explore);set(journey,'--explore-rise',`${(1-explore)*30}px`);
-      set(journey,'--skip-opacity',1-explore);set(journey,'--journey-progress',p);
+      const targetY=reduced.matches?0:clamp(desiredY,-maxY,maxY)*explore;
+      // Re-bound the interpolated camera too: changing viewport or reversing the
+      // zoom must never reveal the empty edge of the image.
+      cameraX=clamp(mix(cameraX,targetX,smoothing*.7),-maxX,maxX);
+      cameraY=clamp(mix(cameraY,targetY,smoothing*.7),-maxY,maxY);
+      set(journey,'--camera-scale',scale);set(journey,'--camera-x',cameraX+'px');set(journey,'--camera-y',cameraY+'px');
+      const flight=smooth(p/.32);
+      set(journey,'--cloud-x',-w*flight*.24+'px');set(journey,'--cloud-y',-vh*flight*.38+'px');set(journey,'--cloud-scale',1+flight*.15);
+      set(journey,'--cloud-opacity',.83*(1-smooth((p-.015)/.28)));set(journey,'--far-opacity',.42*(1-smooth(p/.33)));
+      set(journey,'--far-x',w*flight*.2+'px');set(journey,'--far-y',vh*flight*.3+'px');
+      set(journey,'--explore-opacity',explore);set(journey,'--explore-rise',(1-explore)*35+'px');set(journey,'--journey-progress',p);
       setArrival(explore>.85);
-      if(!mobile.matches){
-        const photoH=Math.max(worldH,worldW/photoRatio);
-        points.forEach(point=>{const spot=places[point.dataset.place];const x=w/2+(spot.x-.5)*photoW*scale+cameraX;const y=vh/2+(spot.y-.5)*photoH*scale+cameraY;point.style.left=`${x}px`;point.style.top=`${y}px`;point.style.visibility=x<32||x>w-32||y<110||y>vh-70?'hidden':'visible';});
-      } else points.forEach(point=>{point.style.removeProperty('left');point.style.removeProperty('top');point.style.removeProperty('visibility');});
+      points.forEach((point,n)=>{
+        const spot=places[point.dataset.place],sx=isMobile?spot.mx:spot.x,sy=isMobile?spot.my:spot.y;
+        const x=w/2+(sx-.5)*photoW*scale+cameraX,y=vh/2+(sy-.5)*photoH*scale+cameraY;
+        const entry=reduced.matches?1:smooth((p-(.15+n*.035))/.17);
+        point.style.left=clamp(x,25,w-25)+'px';point.style.top=clamp(y,170,isMobile?vh*.62:vh-100)+'px';
+        point.classList.toggle('flipped',x>w*.68);
+        set(point,'--flag-opacity',entry);set(point,'--flag-rise',(1-entry)*55+'px');
+      });
       if(Math.abs(progress-target)>.0003||Math.abs(cameraX-targetX)>.15||Math.abs(cameraY-targetY)>.15)requestRender();
     } else {progress=target;lastTime=0;}
     if(!reduced.matches){
@@ -82,7 +93,7 @@
       const e=ending.getBoundingClientRect();if(e.bottom>0&&e.top<vh)set(ending,'--ending-y',`${-clamp((vh-e.top)/(vh+e.height))*vh*.09}px`);
     }
     const current=toneSections.find(el=>{const r=el.getBoundingClientRect();return r.top<=50&&r.bottom>50;});
-    header.classList.toggle('dark',current?.dataset.tone==='dark'||(current===journey&&progress<.55));
+    header.classList.toggle('dark',current?.dataset.tone==='dark'||(current===journey&&progress<.23));
   }
   function requestRender(){if(!frame)frame=requestAnimationFrame(render);}
   addEventListener('scroll',requestRender,{passive:true});addEventListener('resize',requestRender);
@@ -91,18 +102,17 @@
 
   async function selectPlace(key){
     selected=key;const data=places[key],token=++pictureToken;
-    $$('[data-place]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.place===key)));
-    requestRender();
+    points.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.place===key)));
+    $('#place-count').textContent=String(keys.indexOf(key)+1).padStart(2,'0');
     const image=$('#place-image');image.style.opacity='0';
-    await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:200));
+    await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:160));
     if(token!==pictureToken)return;
-    image.src=`/assets/${data.image}.webp`;image.alt=data.alt;
-    $('#place-title').textContent=data.title;$('#place-kicker').textContent=data.kicker;$('#place-caption').textContent=data.caption;$('#place-description').textContent=data.description;
+    image.src='/assets/'+data.image+'.webp';image.alt=data.alt;
+    $('#place-title').textContent=data.title;$('#place-kicker').textContent=data.kicker;$('#place-description').textContent=data.description;
     try{await image.decode();}catch{}
     if(token===pictureToken)image.style.opacity='1';
   }
-  $$('[data-place]').forEach(b=>b.addEventListener('click',()=>selectPlace(b.dataset.place)));
-  $('.place-next').addEventListener('click',()=>selectPlace(keys[(keys.indexOf(selected)+1)%keys.length]));
+  points.forEach(b=>b.addEventListener('click',()=>{manualChoice=b.dataset.place;selectPlace(manualChoice);requestRender();}));
 
   const nav=$('#navigation'),toggle=$('.menu-toggle');let closing=false;
   toggle.addEventListener('click',()=>{nav.showModal();document.body.classList.add('locked');toggle.setAttribute('aria-expanded','true');requestAnimationFrame(()=>nav.classList.add('visible'));});
