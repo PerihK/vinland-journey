@@ -4,7 +4,7 @@ const html = await readFile('dist/index.html', 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 assert.equal(new Set(ids).size, ids.length, 'Duplicate HTML IDs');
 const assets = new Set([...html.matchAll(/(?:src|href)="(\/[^"#]+)"/g)].map(m => m[1]));
-for (const file of assets) assert((await stat(`dist${file}`)).isFile(), `Missing ${file}`);
+for (const file of assets) assert((await stat(`dist${file.split('?')[0]}`)).isFile(), `Missing ${file}`);
 for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id), `Missing anchor ${id}`);
 for (const key of ['shore', 'fields', 'home']) assert((await stat(`dist/assets/${key}.webp`)).size > 0);
 async function bytes(dir) {

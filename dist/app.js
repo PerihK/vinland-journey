@@ -107,7 +107,7 @@
     const image=$('#place-image');image.style.opacity='0';
     await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:160));
     if(token!==pictureToken)return;
-    image.src='/assets/'+data.image+'.webp';image.alt=data.alt;
+    image.src='/assets/'+data.image+'.webp?v=20261003';image.alt=data.alt;
     $('#place-title').textContent=data.title;$('#place-kicker').textContent=data.kicker;$('#place-description').textContent=data.description;
     try{await image.decode();}catch{}
     if(token===pictureToken)image.style.opacity='1';
