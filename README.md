@@ -19,4 +19,3 @@ Vercel serves `dist/` directly. Publish as its own project. Do not add to the po
 ## Assets
 
 All landscape scenes use licensed Unsplash photography, with native originals above 4K; see ASSETS.md and /photography.html. Only the existing alpha cloud layer remains generated. Fonts are local Cormorant Garamond and Roboto, with licenses included in dist/fonts. Source JPEGs and browser QA captures are local and ignored; published assets are compressed WebP.
-
