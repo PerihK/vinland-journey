@@ -9,7 +9,7 @@ for (const [, srcset] of html.matchAll(/srcset="([^"]+)"/g)) {
 }
 for (const file of assets) assert((await stat(`dist${file.split('?')[0]}`)).isFile(), `Missing ${file}`);
 for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id), `Missing anchor ${id}`);
-for (const key of ['shore', 'fields', 'home']) assert((await stat(`dist/assets/${key}.webp`)).size > 0);
+for (const key of ['horizon', 'valley', 'fields', 'home']) assert((await stat(`dist/assets/${key}.webp`)).size > 0);
 async function bytes(dir) {
   let total = 0;
   for (const entry of await readdir(dir, { withFileTypes: true })) {

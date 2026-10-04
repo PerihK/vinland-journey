@@ -18,25 +18,10 @@
   const words=$$('.word-reveal .word');
   const hero=$('.hero'), idea=$('.idea'), journey=$('.journey'), ending=$('.beginning'), header=$('#header');
   const toneSections=$$('[data-tone]');
-  const points=$$('.map-point');
-  const card=$('#place-card'), pointGroup=$('.map-points');
-  const places={
-    shore:{title:'Берег',image:'shore',kicker:'У воды',description:'Только вода, ветер и время. Здесь можно никуда не спешить.',alt:'Северный морской берег и водопад',x:.4,y:.65,mx:.35,my:.65},
-    fields:{title:'Поля',image:'fields-card',kicker:'На земле',description:'Земля, которой хватает. Вырастить урожай и разделить его с теми, кто рядом.',alt:'Зелёное поле под туманной горой',x:.26,y:.3,mx:.22,my:.3},
-    home:{title:'Дом',image:'home-card',kicker:'Рядом с другими',description:'Дверь открыта. За общим столом есть место для каждого.',alt:'Старинные дома с травяными крышами в Саксуне',x:.68,y:.5,mx:.78,my:.48}
-  };
-  const keys=Object.keys(places);
   const mapImage=$('.map-photo');
-  let selected='shore', pictureToken=0, scrollChapter=0, manualChoice=null;
   let frame=0,lastTime=0,progress=0,cameraX=0,cameraY=0;
-  let arrived=false;
   const set=(el,name,value)=>el.style.setProperty(name,value);
   const smooth=t=>{const v=clamp(t);return v*v*(3-2*v);};
-  function setArrival(enabled){
-    arrived=enabled;journey.classList.toggle('arrived',enabled);
-    card.inert=!enabled;pointGroup.inert=!enabled;$('.journey-continue').tabIndex=enabled?0:-1;
-  }
-  setArrival(false);
   mapImage.addEventListener('load',requestRender);
   function render(time){
     frame=0;
@@ -49,42 +34,36 @@
     progress=mix(progress,target,smoothing);
     if(Math.abs(progress-target)<.0003)progress=target;
     if(visible){
-      const p=progress,explore=reduced.matches?1:smooth((p-.28)/.12);
-      // Each place unfolds through scrolling. Clicking a flag is an optional shortcut.
-      const chapter=reduced.matches?0:(p<.53?0:p<.76?1:2);
-      if(chapter!==scrollChapter){scrollChapter=chapter;manualChoice=null;}
-      const active=manualChoice||keys[chapter];
-      if(active!==selected)selectPlace(active);
-      const scale=reduced.matches?1:1.01+.14*smooth(p/.88);
-      const data=places[selected],isMobile=mobile.matches;
-      const photoRatio=mapImage.naturalWidth&&mapImage.naturalHeight?mapImage.naturalWidth/mapImage.naturalHeight:(isMobile?2/3:2);
+      const p=progress,isMobile=mobile.matches;
+      // A continuous camera curve follows the river; there are no chapter jumps.
+      const descent=smooth((p-.07)/.76);
+      const scale=reduced.matches?1:mix(1.035,isMobile?1.27:1.42,descent);
+      const photoRatio=mapImage.naturalWidth&&mapImage.naturalHeight?mapImage.naturalWidth/mapImage.naturalHeight:(isMobile?2/3:1.5);
       const worldW=w*1.02,worldH=vh*1.02;
       const photoW=Math.max(worldW,worldH*photoRatio),photoH=Math.max(worldH,worldW/photoRatio);
-      const landX=isMobile?data.mx:data.x,landY=isMobile?data.my:data.y;
-      const desiredX=(isMobile?.48:.44)*w-(w*.5+(landX-.5)*photoW*scale);
-      const desiredY=(isMobile?.43:.52)*vh-(vh*.5+(landY-.5)*photoH*scale);
-      const maxX=(worldW*scale-w)/2,maxY=(worldH*scale-vh)/2;
-      const targetX=reduced.matches?0:clamp(desiredX,-maxX,maxX)*explore;
-      const targetY=reduced.matches?0:clamp(desiredY,-maxY,maxY)*explore;
+      set(journey,'--photo-width',photoW+'px');set(journey,'--photo-height',photoH+'px');
+      const route=smooth((p-.12)/.72);
+      const landX=isMobile?mix(.59,.34,route):mix(.57,.38,route);
+      const landY=mix(.29,.73,route);
+      // Bound against the covered photograph, including its cropped surplus.
+      const maxX=Math.max(0,(photoW*scale-w)/2-2),maxY=Math.max(0,(photoH*scale-vh)/2-2);
+      const targetX=reduced.matches?0:clamp((.5-landX)*photoW*scale,-maxX,maxX);
+      const targetY=reduced.matches?0:clamp((.5-landY)*photoH*scale,-maxY,maxY);
       // Re-bound the interpolated camera too: changing viewport or reversing the
       // zoom must never reveal the empty edge of the image.
       cameraX=clamp(mix(cameraX,targetX,smoothing*.7),-maxX,maxX);
       cameraY=clamp(mix(cameraY,targetY,smoothing*.7),-maxY,maxY);
       set(journey,'--camera-scale',scale);set(journey,'--camera-x',cameraX+'px');set(journey,'--camera-y',cameraY+'px');
-      const flight=smooth(p/.32);
-      set(journey,'--cloud-x',-w*flight*.24+'px');set(journey,'--cloud-y',-vh*flight*.38+'px');set(journey,'--cloud-scale',1+flight*.15);
-      set(journey,'--cloud-opacity',.83*(1-smooth((p-.015)/.28)));set(journey,'--far-opacity',.42*(1-smooth(p/.33)));
-      set(journey,'--far-x',w*flight*.2+'px');set(journey,'--far-y',vh*flight*.3+'px');
-      set(journey,'--explore-opacity',explore);set(journey,'--explore-rise',(1-explore)*35+'px');set(journey,'--journey-progress',p);
-      setArrival(explore>.85);
-      points.forEach((point,n)=>{
-        const spot=places[point.dataset.place],sx=isMobile?spot.mx:spot.x,sy=isMobile?spot.my:spot.y;
-        const x=w/2+(sx-.5)*photoW*scale+cameraX,y=vh/2+(sy-.5)*photoH*scale+cameraY;
-        const entry=reduced.matches?1:smooth((p-(.15+n*.035))/.17);
-        point.style.left=clamp(x,25,w-25)+'px';point.style.top=clamp(y,170,isMobile?vh*.62:vh-100)+'px';
-        point.classList.toggle('flipped',x>w*.68);
-        set(point,'--flag-opacity',entry);set(point,'--flag-rise',(1-entry)*55+'px');
-      });
+      const opening=smooth(p/.47),exit=smooth((p-.88)/.12);
+      set(journey,'--near-scale',mix(1.04,2.65,opening));
+      set(journey,'--near-x',-w*.15*opening+'px');set(journey,'--near-y',-vh*.22*opening+'px');
+      set(journey,'--near-opacity',reduced.matches?0:1-smooth((p-.08)/.38));
+      set(journey,'--distant-scale',mix(1.1,1.65,opening));
+      set(journey,'--distant-x',w*.07*opening+'px');set(journey,'--distant-y',vh*.11*opening+'px');
+      set(journey,'--distant-opacity',reduced.matches?0:.65*(1-smooth((p-.13)/.46)));
+      set(journey,'--haze-opacity',reduced.matches?0:.94*(1-smooth(p/.28)));
+      set(journey,'--exit-opacity',reduced.matches?0:exit);
+      set(journey,'--journey-progress',p);
       if(Math.abs(progress-target)>.0003||Math.abs(cameraX-targetX)>.15||Math.abs(cameraY-targetY)>.15)requestRender();
     } else {progress=target;lastTime=0;}
     if(!reduced.matches){
@@ -93,26 +72,12 @@
       const e=ending.getBoundingClientRect();if(e.bottom>0&&e.top<vh)set(ending,'--ending-y',`${-clamp((vh-e.top)/(vh+e.height))*vh*.09}px`);
     }
     const current=toneSections.find(el=>{const r=el.getBoundingClientRect();return r.top<=50&&r.bottom>50;});
-    header.classList.toggle('dark',current?.dataset.tone==='dark'||(current===journey&&progress<.23));
+    header.classList.toggle('dark',current?.dataset.tone==='dark'||(current===journey&&!reduced.matches&&(progress<.28||progress>.95)));
   }
   function requestRender(){if(!frame)frame=requestAnimationFrame(render);}
   addEventListener('scroll',requestRender,{passive:true});addEventListener('resize',requestRender);
   reduced.addEventListener('change',()=>{progress=0;requestRender();});mobile.addEventListener('change',requestRender);
   requestRender();
-
-  async function selectPlace(key){
-    selected=key;const data=places[key],token=++pictureToken;
-    points.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.place===key)));
-    $('#place-count').textContent=String(keys.indexOf(key)+1).padStart(2,'0');
-    const image=$('#place-image');image.style.opacity='0';
-    await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:160));
-    if(token!==pictureToken)return;
-    image.src='/assets/'+data.image+'.webp?v=photo20261003';image.alt=data.alt;
-    $('#place-title').textContent=data.title;$('#place-kicker').textContent=data.kicker;$('#place-description').textContent=data.description;
-    try{await image.decode();}catch{}
-    if(token===pictureToken)image.style.opacity='1';
-  }
-  points.forEach(b=>b.addEventListener('click',()=>{manualChoice=b.dataset.place;selectPlace(manualChoice);requestRender();}));
 
   const nav=$('#navigation'),toggle=$('.menu-toggle');let closing=false;
   toggle.addEventListener('click',()=>{nav.showModal();document.body.classList.add('locked');toggle.setAttribute('aria-expanded','true');requestAnimationFrame(()=>nav.classList.add('visible'));});
